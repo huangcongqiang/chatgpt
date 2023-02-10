@@ -1,0 +1,79 @@
+
+<html>
+  <head>
+    <title>ChatGPT Chatbot</title>
+  </head>
+  <body>
+    <div id="chatbox">
+      <div id="chatlogs">
+        <div class="chat self">
+          <p>Hi, I'm ChatGPT. How can I help you today?</p>
+        </div>
+      </div>
+      <input type="text" id="chatinput" placeholder="Type your message here..." />
+    </div>
+  </body>
+  <style>
+    .self{
+      background-color: chartreuse;
+      padding: 10px;
+    }
+    .other{
+      background-color: beige;
+      padding: 10px;
+    }
+    .chat p{
+      white-space: pre-line;
+    }
+  </style>
+  <script>
+    //auth: huangcongqiang
+    //请注意，上面的代码仅是一个示例，您需要替换为自己的 OpenAI API 密钥。此外，请注意这仅是一个简单的实现，您可以对其进行更多的定制，以满足您的特定需求。
+    
+    const chatinput = document.getElementById("chatinput");
+    const chatlogs = document.getElementById("chatlogs");
+
+    chatinput.addEventListener("keyup", function(event) {
+      if (event.keyCode === 13) {
+        // User hit enter, send message to ChatGPT
+
+        // Create chat message element
+        const chatMessage = document.createElement("div");
+        chatMessage.classList.add("chat");
+        chatMessage.classList.add("self");
+        chatMessage.innerHTML = `<p>${chatinput.value}</p>`;
+        chatlogs.appendChild(chatMessage);
+
+        // Call OpenAI API
+        fetch(`https://api.openai.com/v1/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <api-key>"
+          },
+          body: JSON.stringify({
+            prompt: chatinput.value,
+            max_tokens: 2048,
+            temperature: 0,
+            model: "text-davinci-003"
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Create chat message element
+          const chatMessage = document.createElement("div");
+          chatMessage.classList.add("chat");
+          chatMessage.classList.add("other");
+          chatMessage.innerHTML = `<p>${data.choices[0].text}</p>`;
+          chatlogs.appendChild(chatMessage);
+
+          // Scroll to bottom
+          chatlogs.scrollTop = chatlogs.scrollHeight;
+        });
+
+        // Clear input field
+        chatinput.value = "";
+      }
+    });
+  </script>
+</html>
